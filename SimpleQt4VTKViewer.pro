@@ -78,7 +78,11 @@ LIBS += \
   -lvtkImagingCore-7.1 \
   -lvtkImagingFourier-7.1 \
   -lvtkInteractionStyle-7.1 \
+  -lvtkInteractionImage-7.1 \
+  -lvtkInteractionWidgets-7.1 \
+  -lvtkRenderingAnnotation-7.1 \
   -lvtkRenderingCore-7.1 \
+  -lvtkRenderingFreeType-7.1 \
   -lvtkRenderingOpenGL2-7.1 \
   -lvtkalglib-7.1 \
   -lvtkglew-7.1 \
@@ -88,3 +92,4 @@ LIBS += \
   -lvtksys-7.1 \
   -lvtktiff-7.1 \
   -lvtkzlib-7.1
+DISTFILES +=

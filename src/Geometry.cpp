@@ -24,44 +24,70 @@
 #include <vtkPassThrough.h>
 #include <vtkPolyData.h>
 #include <vtkCubeSource.h>
+#include <vtkSphereSource.h>
 //#include <vtkSphereSource.h>
 
-Geometry::Geometry(QObject *parent) : QObject(parent)
+Geometry::Geometry(int a, QObject* parent) : QObject(parent)
 {
+  double center[3] = { 0.0, 0.0, 0.0 };
+  //int ver=1;
+  ver=a;
   m_inputFilter = vtkSmartPointer<vtkPassThrough>::New();
   m_data = vtkSmartPointer<vtkPolyData>::New();
 
 //  double center[3] = { -5.0, -5.0, 5.0 };
-  double center[3] = { 0.0, 0.0, 0.0 };
-  m_data->ShallowCopy(CreateGeometryData(center));
+
+  m_data->ShallowCopy(CreateGeometryData(center,ver));
 
   m_inputFilter->SetInputData(m_data);
 }
 
-vtkSmartPointer<vtkPolyData> Geometry::CreateGeometryData(double center[3])
+Geometry::Geometry(Geometry&& geom) :
+  QObject(geom.parent())
+{
+    ver = geom.ver;
+    m_inputFilter = vtkSmartPointer<vtkPassThrough>::New();
+    m_data = vtkSmartPointer<vtkPolyData>::New();
+
+    m_data->DeepCopy(geom.m_data);
+    m_inputFilter->SetInputData(m_data);
+}
+
+
+vtkSmartPointer<vtkPolyData> Geometry::CreateGeometryData(double center[3], int ver)
 {
   // Create a cube
-  vtkSmartPointer<vtkCubeSource> cubeSource =
-    vtkSmartPointer<vtkCubeSource>::New();
-  cubeSource->SetCenter(center);
-  cubeSource->SetBounds(
-    -0.5, 0.5,
-    -0.5, 0.5,
-    -0.5, 0.5);
+  if(ver==0){
+      vtkSmartPointer<vtkCubeSource> cubeSource =
+      vtkSmartPointer<vtkCubeSource>::New();
+      cubeSource->SetCenter(center);
+      cubeSource->SetBounds(
+        -0.5, 0.5,
+        -0.5, 0.5,
+        -0.5, 0.5);
+      cubeSource->Update();
+      vtkSmartPointer<vtkPolyData> data =
+        vtkSmartPointer<vtkPolyData>::New();
 
-//  // Create a sphere
-//  vtkSmartPointer<vtkCubeSource> cubeSource =
-//    vtkSmartPointer<vtkCubeSource>::New();
-//  sphereSource->SetRadius(3.0);
-//  sphereSource->SetPhiResolution(20);
-//  sphereSource->SetThetaResolution(20);
+      data->ShallowCopy(cubeSource->GetOutput());
+      return data;
+  }
 
-  cubeSource->Update();
+
+  vtkSmartPointer<vtkSphereSource> sphereSource =
+  vtkSmartPointer<vtkSphereSource>::New();
+  sphereSource->SetCenter(center);
+  sphereSource->SetRadius(0.5);
+  sphereSource->SetPhiResolution(20);
+  sphereSource->SetThetaResolution(20);
+  sphereSource->Update();
+
+
 
   vtkSmartPointer<vtkPolyData> data =
     vtkSmartPointer<vtkPolyData>::New();
 
-  data->ShallowCopy(cubeSource->GetOutput());
+  data->ShallowCopy(sphereSource->GetOutput());
   return data;
 }
 
@@ -78,7 +104,7 @@ vtkPolyData* Geometry::getGeometryData()
   return vtkPolyData::SafeDownCast( m_inputFilter->GetOutput() );
 }
 
-void Geometry::setNewCenter(double center[3])
+void Geometry::setNewCenter(double center[3], int ver)
 {
-  m_data->ShallowCopy(CreateGeometryData(center));
+  m_data->ShallowCopy(CreateGeometryData(center, ver));
 }

@@ -33,19 +33,21 @@ class Geometry : public QObject
 {
   Q_OBJECT
 public:
-  explicit Geometry(QObject *parent = 0);
-
+  explicit Geometry(int a = 0, QObject *parent = 0);
+  Geometry(Geometry&&);
+  int ver=0;
+  double center[3];
   vtkAlgorithmOutput* getGeometryConection();
   vtkPolyData* getGeometryData();
 
-  void setNewCenter(double center[3]);
+  void setNewCenter(double center[3], int ver);
 
 signals:
 
 public slots:
 
 protected:
-  static vtkSmartPointer<vtkPolyData> CreateGeometryData(double center[3]);
+  static vtkSmartPointer<vtkPolyData> CreateGeometryData(double center[3], int ver);
 
   vtkSmartPointer<vtkPolyData>    m_data;
   vtkSmartPointer<vtkPassThrough> m_inputFilter;

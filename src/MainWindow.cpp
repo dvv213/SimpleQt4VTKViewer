@@ -65,7 +65,7 @@ MainWindow::MainWindow(QWidget *parent) :
     m_ui->action_About, SIGNAL(triggered(bool)),
     this,               SLOT(showAboutDialog()));
 
-  m_geomList.append(std::make_shared<Geometry>(this));
+  m_geomList.append(std::make_shared<Geometry>(Geometry(0, this)));
 
   addPlot();
 }
@@ -80,6 +80,7 @@ MainWindow::~MainWindow()
 void MainWindow::addPlot()
 {
   m_plotList.append(new PlotHD(m_ui->m_plotsWidget));
+  int indice=m_plotList.size();
 
   m_ui->m_plotsWidget->layout()->addWidget(m_plotList.last());
 
@@ -88,7 +89,11 @@ void MainWindow::addPlot()
     addGeometry();
   }
 
-  m_plotList.last()->addGeometry(m_geomList.last());
+  m_plotList.last()->addGeometry(indice, m_geomList.last());
+  for( PlotHD* plt : m_plotList )
+  {
+    plt->reset_camera();
+  }
 
 //  vtkDebugLeaks::PrintCurrentLeaks();
 }
@@ -108,34 +113,46 @@ void MainWindow::removePlot()
 }
 
 void MainWindow::addGeometry()
-{
-  m_geomList.append(std::make_shared<Geometry>(this));
+{ int indice;
+  indice=m_ui->comboBox->currentIndex();
+  if(indice==0){
+//      m_geomList.append(std::shared_ptr<Geometry>(new Geometry(0,0)));
+      m_geomList.append(std::make_shared<Geometry>(Geometry(0, this)));
+  }
+  else{
+//      m_geomList.append(std::shared_ptr<Geometry>(new Geometry(0,1)));
+      m_geomList.append(std::make_shared<Geometry>(Geometry(1, this)));
+  }
+
+
+
 
 //  vtkDebugLeaks::PrintCurrentLeaks();
 }
 
 void MainWindow::removeGeometry()
 {
-  if( m_geomList.isEmpty() )
-  {
-    std::cout << "No more geometries left!!!" << std::endl;
-    return;
-  }
 
-  m_geomList.last().reset();
-  m_geomList.pop_back();
-
-  QVector<PlotHD*> newPlotList;
-
-  for( PlotHD* plt : m_plotList )
-  {
-    if( !plt->checkPlotDeletion() )
+    if( m_geomList.isEmpty() )
     {
-      newPlotList << plt;
+      std::cout << "No more geometries left!!!" << std::endl;
+      return;
     }
-  }
 
-  m_plotList = newPlotList;
+    m_geomList.last().reset();
+    m_geomList.pop_back();
+
+    QVector<PlotHD*> newPlotList;
+
+    for( PlotHD* plt : m_plotList )
+    {
+      if( !plt->checkPlotDeletion() )
+      {
+        newPlotList << plt;
+      }
+    }
+
+    m_plotList = newPlotList;
 
 //  vtkDebugLeaks::PrintCurrentLeaks();
 }
@@ -151,6 +168,8 @@ void MainWindow::customEvent(QEvent* ev)
 
 MainWindow& MainWindow::GetWindowInstance()
 {
+//  static MainWindow w;
+//  return w;
   if( !m_winInstance )
   {
     m_winInstance = new MainWindow();
@@ -184,3 +203,5 @@ void MainWindow::showAboutDialog()
   dialog->setModal(true);
   dialog->show();
 }
+
+

@@ -55,6 +55,10 @@ protected:
   MainWindow(QWidget* parent = 0);
   virtual void customEvent(QEvent*);
 
+private slots:
+
+
+
 private:
   static MainWindow*                  m_winInstance;
 

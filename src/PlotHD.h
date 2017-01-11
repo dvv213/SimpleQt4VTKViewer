@@ -26,6 +26,7 @@
 #include <vtkSmartPointer.h>
 
 #include <memory>
+#include <stdlib.h>
 
 class Geometry;
 
@@ -34,24 +35,26 @@ class vtkRenderer;
 
 class PlotHD : public QWidget
 {
-	Q_OBJECT
+    Q_OBJECT
 public:
-	explicit PlotHD(QWidget *parent = 0);
-	virtual ~PlotHD();
+    explicit PlotHD(QWidget *parent = 0);
+    virtual ~PlotHD();
 
-	void addGeometry(std::weak_ptr<Geometry> geom);
+    void addGeometry(int indice , std::weak_ptr<Geometry> geom);
 
-	bool checkPlotDeletion();
+    void reset_camera();
+
+    bool checkPlotDeletion();
 
 signals:
 
 public slots:
 
 protected:
-	std::weak_ptr<Geometry> m_geom;
+    std::weak_ptr<Geometry> m_geom;
 
-	QVTKWidget2* m_renderWidget;
-	vtkSmartPointer<vtkRenderer> m_renderer;
+    QVTKWidget2* m_renderWidget;
+    vtkSmartPointer<vtkRenderer> m_renderer;
 };
 
 #endif // PLOTHD_H

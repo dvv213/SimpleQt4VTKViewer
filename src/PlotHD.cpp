@@ -23,6 +23,7 @@
 #include <vtkActor.h>
 #include <vtkActorCollection.h>
 #include <vtkAutoInit.h>
+#include <vtkCaptionActor2D.h>
 #include <vtkGenericOpenGLRenderWindow.h>
 #include <vtkInteractorStyle.h>
 #include <vtkTDxInteractorStyleCamera.h>
@@ -32,17 +33,25 @@
 #include <vtkRenderer.h>
 #include <vtkRenderWindow.h>
 #include <vtkRenderWindowInteractor.h>
+//#include <vtkCaptionRepresentation.h>
+//#include <vtkCaptionWidget.h>
+#include <vtkTextActor.h>
+#include <vtkTextProperty.h>
+#include "vtkCubeAxesActor.h"
+
 
 #include <QVTKWidget2.h>
 
 #include <QApplication>
 #include <QVBoxLayout>
+#include <QString>
 
 #include "Geometry.h"
 #include "MainWindow.h"
 
-VTK_MODULE_INIT(vtkRenderingOpenGL2)
 VTK_MODULE_INIT(vtkInteractionStyle)
+VTK_MODULE_INIT(vtkRenderingOpenGL2)
+VTK_MODULE_INIT(vtkRenderingFreeType)
 
 PlotHD::PlotHD(QWidget *parent) : QWidget(parent)
 {
@@ -61,24 +70,74 @@ PlotHD::PlotHD(QWidget *parent) : QWidget(parent)
 
 PlotHD::~PlotHD()
 {
+//  delete m_renderWidget;
+//	if( vtkActorCollection* actors = m_renderer->GetActors() )
+//	{
+//		while( vtkActor* act = actors->GetNextActor() )
+//		{
+//			act->GetMapper()->RemoveAllInputs();
+//			act->SetMapper(nullptr);
+//		}
+//	}
+
+//	m_renderWidget->GetRenderWindow()->RemoveRenderer(m_renderer);
+
+//	qApp->postEvent(
+//		MainWindow::GetWindowInstance(),
+//		new QEvent(QEvent::Type(1000)));
 }
 
-void PlotHD::addGeometry(std::weak_ptr<Geometry> geom)
+void PlotHD::addGeometry(int indice, std::weak_ptr<Geometry> geom)
 {
   if( auto validGeom = geom.lock() )
-  {
-    m_geom = geom;
+  { m_geom = geom;
+    std::string s = std::to_string(indice);
+    char const *pchar = s.c_str();
+
+    vtkSmartPointer<vtkTextActor> textActor = vtkSmartPointer<vtkTextActor>::New();
+    textActor->SetInput ( pchar );
+    textActor->SetPosition2 ( 10, 40 );
+    textActor->GetTextProperty()->SetFontSize ( 24 );
+
+
+    //textActor->GetTextProperty()->SetColor ( 1.0, 0.0, 0.0 );
+
+
+    //vtkSmartPointer<vtkCaptionActor2D> captionActor =
+     //   vtkSmartPointer<vtkCaptionActor2D>::New();
+    //vtkSmartPointer< vtkCaptionWidget > node1 = vtkSmartPointer< vtkCaptionWidget >::New();
+    //vtkCaptionActor2D *captionActor = node1->GetCaptionActor2D();
+    //captionActor->SetCaption(pchar);
+    //captionActor->SetDisplayPosition(0,0);
+    //captionActor->SetPosition2( 20, 20 );
+    //captionActor->BorderOff();
+    //captionActor->LeaderOff();
+    //captionActor->ThreeDimensionalLeaderOn();
+    //captionActor->GetCaptionTextProperty()->SetFontSize( 24 );
+
+    vtkSmartPointer<vtkCubeAxesActor> axes=vtkSmartPointer<vtkCubeAxesActor> ::New();
+    axes->SetCamera(m_renderer->GetActiveCamera());
+    //axes->SetFlyModeToClosestTriad();
+    m_renderer->AddViewProp( axes.GetPointer()) ;
+
 
     vtkSmartPointer<vtkPolyDataMapper> mapper =
-      vtkSmartPointer<vtkPolyDataMapper>::New();
+        vtkSmartPointer<vtkPolyDataMapper>::New();
     mapper->SetInputConnection(validGeom->getGeometryConection());
 
     vtkSmartPointer<vtkActor> actor =
-      vtkSmartPointer<vtkActor>::New();
+        vtkSmartPointer<vtkActor>::New();
     actor->SetMapper(mapper);
-    actor->GetProperty()->SetColor(0.0, 0.0, 1.0);
-
+    float r1 = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+    float r2 = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+    float r3 = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+    actor->GetProperty()->SetColor(r1, r2, r3);
     m_renderer->AddActor(actor);
+    //m_renderer->AddActor2D(captionActor);
+    m_renderer->AddActor2D(textActor);
+    m_renderer->ResetCamera();
+
+
   }
 }
 
@@ -92,4 +151,8 @@ bool PlotHD::checkPlotDeletion()
   }
 
   return false;
+}
+void PlotHD::reset_camera()
+{
+    m_renderer->ResetCamera();
 }
