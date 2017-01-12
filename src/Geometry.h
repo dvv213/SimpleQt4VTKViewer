@@ -33,6 +33,11 @@ class Geometry : public QObject
 {
   Q_OBJECT
 public:
+  enum GeometryShape
+  {
+      SHAPE_SPHERE = 0 , SHAPE_CUBE = 1
+  };
+
   explicit Geometry(int a = 0, QObject *parent = 0);
   Geometry(Geometry&&);
   int ver=0;
@@ -47,8 +52,8 @@ signals:
 public slots:
 
 protected:
-  static vtkSmartPointer<vtkPolyData> CreateGeometryData(double center[3], int ver);
-
+  static vtkSmartPointer<vtkPolyData> CreateGeometryData(double center[3], int shape);
+  GeometryShape m_shape;
   vtkSmartPointer<vtkPolyData>    m_data;
   vtkSmartPointer<vtkPassThrough> m_inputFilter;
 };

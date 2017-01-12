@@ -80,7 +80,7 @@ MainWindow::~MainWindow()
 void MainWindow::addPlot()
 {
   m_plotList.append(new PlotHD(m_ui->m_plotsWidget));
-  int indice=m_plotList.size();
+  int ind=m_plotList.size();
 
   m_ui->m_plotsWidget->layout()->addWidget(m_plotList.last());
 
@@ -89,10 +89,10 @@ void MainWindow::addPlot()
     addGeometry();
   }
 
-  m_plotList.last()->addGeometry(indice, m_geomList.last());
+  m_plotList.last()->addGeometry(ind, m_geomList.last());
   for( PlotHD* plt : m_plotList )
   {
-    plt->reset_camera();
+    plt->resetCamera();
   }
 
 //  vtkDebugLeaks::PrintCurrentLeaks();
@@ -113,13 +113,15 @@ void MainWindow::removePlot()
 }
 
 void MainWindow::addGeometry()
-{ int indice;
-  indice=m_ui->comboBox->currentIndex();
-  if(indice==0){
+{
+    int ind=m_ui->comboBox->currentIndex();
+  if(ind==0)
+  {
 //      m_geomList.append(std::shared_ptr<Geometry>(new Geometry(0,0)));
       m_geomList.append(std::make_shared<Geometry>(Geometry(0, this)));
   }
-  else{
+  else
+  {
 //      m_geomList.append(std::shared_ptr<Geometry>(new Geometry(0,1)));
       m_geomList.append(std::make_shared<Geometry>(Geometry(1, this)));
   }

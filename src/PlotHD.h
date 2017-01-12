@@ -38,11 +38,10 @@ class PlotHD : public QWidget
     Q_OBJECT
 public:
     explicit PlotHD(QWidget *parent = 0);
-    virtual ~PlotHD();
 
     void addGeometry(int indice , std::weak_ptr<Geometry> geom);
 
-    void reset_camera();
+    void resetCamera();
 
     bool checkPlotDeletion();
 

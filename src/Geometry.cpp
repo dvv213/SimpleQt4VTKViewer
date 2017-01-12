@@ -30,14 +30,12 @@
 Geometry::Geometry(int a, QObject* parent) : QObject(parent)
 {
   double center[3] = { 0.0, 0.0, 0.0 };
-  //int ver=1;
-  ver=a;
+  m_shape=GeometryShape(a);
   m_inputFilter = vtkSmartPointer<vtkPassThrough>::New();
   m_data = vtkSmartPointer<vtkPolyData>::New();
 
-//  double center[3] = { -5.0, -5.0, 5.0 };
 
-  m_data->ShallowCopy(CreateGeometryData(center,ver));
+  m_data->ShallowCopy(CreateGeometryData(center,m_shape));
 
   m_inputFilter->SetInputData(m_data);
 }
@@ -54,10 +52,11 @@ Geometry::Geometry(Geometry&& geom) :
 }
 
 
-vtkSmartPointer<vtkPolyData> Geometry::CreateGeometryData(double center[3], int ver)
+vtkSmartPointer<vtkPolyData> Geometry::CreateGeometryData(double center[3], int shape)
 {
   // Create a cube
-  if(ver==0){
+  if(shape==0)
+  {
       vtkSmartPointer<vtkCubeSource> cubeSource =
       vtkSmartPointer<vtkCubeSource>::New();
       cubeSource->SetCenter(center);

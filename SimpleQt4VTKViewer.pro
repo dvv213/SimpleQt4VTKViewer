@@ -89,7 +89,4 @@ LIBS += \
   -lvtkjpeg-7.1 \
   -lvtkmetaio-7.1 \
   -lvtkpng-7.1 \
-  -lvtksys-7.1 \
-  -lvtktiff-7.1 \
-  -lvtkzlib-7.1
-DISTFILES +=
+
